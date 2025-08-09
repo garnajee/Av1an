@@ -1,12 +1,12 @@
-# Use the sickcodes/docker-osxcross image which has the macOS SDK and cross-compilation toolchain
-FROM sickcodes/docker-osxcross:latest
+# Use the crazymax/osxcross image for macOS cross-compilation
+FROM crazymax/osxcross:latest
 
 # Install build dependencies for av1an
+# The crazymax/osxcross image is based on Debian and has the basic build tools.
+# We need to install Rust, Python, VapourSynth, and nasm.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
-    build-essential \
     nasm \
-    clang \
     python3 \
     python3-pip \
     python3-dev \
@@ -21,13 +21,8 @@ ENV RUSTUP_HOME=/usr/local/rustup \
     PATH=/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
 
-# Set up environment for cross-compilation
-ENV CC=x86_64-apple-darwin21.4-clang
-ENV CXX=x86_64-apple-darwin21.4-clang++
-ENV CARGO_TARGET_X86_64_APPLE_DARWIN_LINKER=$CC
-
-# Add osxcross libraries to rustc search path
-ENV RUSTFLAGS="-L /usr/osxcross/macports/pkgs/opt/local/lib"
+# The crazymax/osxcross image should configure the cross-compilation
+# environment automatically for cargo. We just need to specify the target.
 
 # Create a new directory for the build
 WORKDIR /build
