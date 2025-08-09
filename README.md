@@ -62,6 +62,22 @@ Av1an can be installed from package managers, cargo.io, or [compiled manually](h
 
 For Windows users, prebuilt binaries are also included in every [release](https://github.com/rust-av/Av1an/releases), and a [nightly build](https://github.com/rust-av/Av1an/releases/tag/latest) of the current `master` branch is also available.
 
+### Building for macOS using Docker
+
+If you are on a non-macOS machine and want to build `av1an` for macOS, you can do so using Docker and the provided `docker-compose.yml` file. This method cross-compiles `av1an` and places the binary in a `./bin` directory.
+
+**Prerequisites:**
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+To build, simply run:
+```sh
+docker-compose up av1an-macos-builder
+```
+The compiled `av1an` binary will be available in the `bin/` directory.
+
+**Note:** The compiled binary is for `x86_64` architecture. It is dynamically linked, so you will need to have the necessary runtime dependencies (like FFmpeg and VapourSynth) installed on the target macOS machine.
+
 ### Package managers
 
 Arch Linux & Manjaro: `pacman -S av1an`

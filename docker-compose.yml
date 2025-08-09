@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  av1an-macos-builder:
+    build:
+      context: .
+      dockerfile: Dockerfile.macos
+    # The command will copy the built binary to the output directory.
+    # The output directory is mounted as a volume, so the binary will be available on the host.
+    command: bash -c "mkdir -p /output && cp /build/target/x86_64-apple-darwin/release/av1an /output/av1an"
+    volumes:
+      - ./bin:/output

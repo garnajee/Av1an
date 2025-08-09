@@ -1,0 +1,41 @@
+# Use the sickcodes/docker-osxcross image which has the macOS SDK and cross-compilation toolchain
+FROM sickcodes/docker-osxcross:latest
+
+# Install build dependencies for av1an
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    build-essential \
+    nasm \
+    clang \
+    python3 \
+    python3-pip \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install VapourSynth using pip
+RUN pip3 install vapoursynth
+
+# Install Rust using rustup
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+
+# Set up environment for cross-compilation
+ENV CC=x86_64-apple-darwin21.4-clang
+ENV CXX=x86_64-apple-darwin21.4-clang++
+ENV CARGO_TARGET_X86_64_APPLE_DARWIN_LINKER=$CC
+
+# Add osxcross libraries to rustc search path
+ENV RUSTFLAGS="-L /usr/osxcross/macports/pkgs/opt/local/lib"
+
+# Create a new directory for the build
+WORKDIR /build
+
+# Copy the source code into the container
+COPY . .
+
+# Build av1an for macOS
+RUN cargo build --target=x86_64-apple-darwin --release
+
+# The final binary will be at /build/target/x86_64-apple-darwin/release/av1an
